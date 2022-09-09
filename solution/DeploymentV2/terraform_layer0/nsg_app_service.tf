@@ -40,7 +40,7 @@ resource "azurerm_network_security_rule" "app_service_in_deny_all" {
 
 # association
 resource "azurerm_subnet_network_security_group_association" "app_service_nsg" {
-  count                     = (var.is_vnet_isolated && var.existing_app_service_subnet_id == "" ? 1 : 0)
+  count                     = (var.is_vnet_isolated && var.existing_app_service_subnet_id == "" && var.deploy_app_service_plan? 1 : 0)
   subnet_id                 = local.app_service_subnet_id
   network_security_group_id = azurerm_network_security_group.app_service_nsg[0].id
   timeouts {}

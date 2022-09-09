@@ -44,7 +44,7 @@ data "azurerm_client_config" "current" {
 module "naming" {
   source  = "Azure/naming/azurerm"
   version = "0.2.0"
-  #unique-seed = data.terraform_remote_state.layer1.outputs.naming_unique_seed
+  unique-seed = "asoseed"
   prefix = [
     var.prefix,
     var.environment_tag
