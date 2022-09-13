@@ -8,6 +8,6 @@
         container_name       = "tstate"
         key                  = "terraform_layer0.tfstate"
         resource_group_name  = "aso-rg"
-        storage_account_name = "asotfstatestorage"
+        storage_account_name = "asotfstateads"
       }
     }
