@@ -9,6 +9,10 @@ terraform {
       source  = "hashicorp/azuread"
       version = "=2.28.0"
     }
+    databricks = {
+      source  = "databricks/databricks"
+      version = "=1.6.1"
+    }
     random = {
       source  = "hashicorp/random"
       version = "=3.3.2"
@@ -28,6 +32,11 @@ provider "azurerm" {
 
 provider "azuread" {
   tenant_id = var.tenant_id
+}
+
+provider "databricks" {
+  alias = "created_workspace"
+  host = azurerm_databricks_workspace.workspace.workspace_url
 }
 
 data "azurerm_client_config" "current" {
