@@ -6,7 +6,7 @@ resource "azurerm_databricks_workspace" "workspace" {
   sku                 = "premium"
 
 
-  public_network_access_enabled = (var.is_vnet_isolated == false)
+  public_network_access_enabled = true
   network_security_group_rules_required = var.is_vnet_isolated ? "NoAzureDatabricksRules" : null
   
   dynamic "custom_parameters" {
@@ -62,4 +62,35 @@ resource "azurerm_private_endpoint" "databricks_auth_pe" {
     private_connection_resource_id = azurerm_databricks_workspace.workspace[0].id
     subresource_names              = ["browser_authentication"]
   }
+}
+
+resource "azurerm_role_assignment" "databricks_data_factory" {
+  count                = var.deploy_databricks && var.deploy_data_factory ? 1 : 0
+  scope                = azurerm_databricks_workspace.workspace[0].id
+  role_definition_name = "Contributor"
+  principal_id         = azurerm_data_factory.data_factory[0].identity[0].principal_id
+}
+
+resource "databricks_repo" "ads_repo" {
+  provider  = databricks.created_workspace
+  url       = "https://github.com/microsoft/azure-data-services-go-fast-codebase.git"
+  path      = "/Repos/shared/azure-data-services-go-fast-codebase"
+}
+
+resource "databricks_workspace_conf" "this" {
+  provider = databricks.created_workspace
+  custom_config = {
+    "enableIpAccessLists" : true
+  }
+}
+
+resource "databricks_ip_access_list" "allowed-list" {
+  provider = databricks.created_workspace
+  label     = "allow_in"
+  list_type = "ALLOW"
+  ip_addresses = [
+    var.ip_address, 
+    var.ip_address2
+  ]
+  depends_on = [databricks_workspace_conf.this]
 }
